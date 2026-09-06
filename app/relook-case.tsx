@@ -40,6 +40,6 @@ export default function RelookCase(){
    </div>
   </div>
   <div className="relook-comparison"><div><span className="eyebrow">THE CHANGE ACROSS RELOOK</span><p>The regions provide stronger support immediately after the revisit.</p><span className="fineprint">The answer stays Yes. Stronger support here does not establish an overall accuracy gain or isolate relook from the additional text.</span></div><div className="relook-pair"><div><small>Before</small><strong>{signed(pre)}<small>pp</small></strong></div><ArrowRight size={20}/><div><small>After</small><strong>{signed(post)}<small>pp</small></strong></div><span className="relook-delta">{signed(post-pre)} pp change</span></div></div>
-  <a className="download-link" href="/assets/relook-case.json" download><Download size={15}/> Download the trace and checkpoint measurements</a>
+  <a className="download-link" href="assets/relook-case.json" download><Download size={15}/> Download the trace and checkpoint measurements</a>
  </article>;
 }
