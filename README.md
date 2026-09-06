@@ -20,7 +20,7 @@ npm run build
 npm start
 ```
 
-The production build uses Vinext, Vite, and the Cloudflare Workers runtime. Mathematical formulas are rendered with KaTeX.
+The website is a static React application built with Vite, suitable for GitHub Pages. Mathematical formulas are rendered with KaTeX.
 
 ## Website structure
 
@@ -55,7 +55,7 @@ Hidden selected regions use the recorded processor-mean baseline; pixels outside
 
 ## Deployment
 
-The source includes the existing Sites/Vinext build integration. The local hosting configuration has no assigned Sites project ID. Publishing to Sites requires binding it to your own project; publishing to GitHub alone does not deploy the website or configure GitHub Pages.
+The site is published at https://regiontrace-anon.github.io/regiontrace/. The GitHub Actions workflow in `.github/workflows/deploy.yml` builds and deploys it on every push to `main`. In repository Settings → Pages, the source must be GitHub Actions. The Vite base path is `/regiontrace/`; update it if you deploy under a different repository name.
 
 ## Validation
 
