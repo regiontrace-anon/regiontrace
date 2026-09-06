@@ -1,0 +1,81 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { flushSync } from 'react-dom';
+import { ArrowUpRight, ArrowRight, Scan, MoveUpRight, Download, BookOpen, RotateCcw, ChevronRight } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
+import data from './coalitions.json';
+import MethodWalkthrough from './method-walkthrough';
+import SectionNavigation from './section-navigation';
+import RelookCase from './relook-case';
+
+const regions = [
+  {name:'Body',en:'Body of mug',value:5.875,color:'#bc397d',pos:'0% 89.4737%',desc:'Black is present, but on the body. The body provides the strongest average support for the incorrect Yes.'},
+  {name:'Rim',en:'Rim of mug',value:-0.4375,color:'#069cbf',pos:'100% 0%',desc:'The queried rim is white. Its negative average contribution suppresses the incorrect Yes.'},
+  {name:'Remainder',en:'Rest of mug',value:0.1875,color:'#c58e00',pos:'100% 89.4737%',desc:'The remaining parts contribute little on average. Region Effect measures support for a fixed answer, rather than attention allocation.'},
+];
+const stages = [
+ {name:'Before explanation',label:'Question only',text:'Is the water crashing against the rocks in the blue sea?',effect:93.2,baseline:0.1,note:'Before explanation, the complete image assigns Yes a candidate-normalized probability of 98.0%. Restoring the selected regions adds 93.2 percentage points of support.'},
+ {name:'After sentence one',label:'First sentence',text:'“The image shows waves in the blue sea.”',effect:1.1,baseline:89.3,note:'After the first sentence, support for Yes reaches 89.3% even with the entire image replaced by the baseline. The selected regions add only 1.1 percentage points.'},
+ {name:'Before the answer',label:'Before the answer',text:'“waves crash against rocks” → “water is crashing”',effect:0,baseline:100,note:'Before the answer, baseline support under the fixed explanation approaches 100%, while the selected regions add almost nothing. This measures conditional support; it does not imply that the model ignores the image.'},
+];
+
+export default function Home(){
+ const [region,setRegion]=useState(0);
+ const [stage,setStage]=useState(0);
+ const [visible,setVisible]=useState([true,true,true]);
+ const [tab,setTab]=useState('binding');
+ useEffect(()=>{
+  type Tool = {name:string;description:string;inputSchema:object;annotations:object;execute:(input:unknown)=>unknown};
+  const context=(document as Document & {modelContext?:{registerTool:(tool:Tool,options:{signal:AbortSignal})=>void|Promise<void>}}).modelContext;
+  if(!context?.registerTool)return;
+  const lifecycle=new AbortController();
+  try {Promise.resolve(context.registerTool({
+   name:'explore_region_combination',
+   description:'Show a precomputed RegionTrace spatial case with the selected suitcase, couch and chair visibility, and return its measured Yes score.',
+   inputSchema:{type:'object',properties:{visible:{type:'array',items:{type:'boolean'},minItems:3,maxItems:3}},required:['visible'],additionalProperties:false},
+   annotations:{readOnlyHint:false,untrustedContentHint:false},
+   execute(input:unknown){
+    if(!input || typeof input!=='object' || Array.isArray(input))throw new Error('Expected an object with visible.');
+    const obj=input as Record<string,unknown>;
+    if(Object.keys(obj).length!==1 || !Array.isArray(obj.visible) || obj.visible.length!==3 || !obj.visible.every(v=>typeof v==='boolean'))throw new Error('visible must contain three booleans: suitcase, couch, chair.');
+    const values=obj.visible as boolean[];
+    const k=values.map(v=>v?'1':'0').join('') as keyof typeof data.coalition_scores;
+    flushSync(()=>{setVisible([...values])});
+    document.getElementById('explorer')?.scrollIntoView({behavior:'instant'});
+    return {combination:k,...data.coalition_scores[k]};
+   }
+  },{signal:lifecycle.signal})).catch(()=>{});}catch{/* Optional browser API; UI remains available. */}
+  return ()=>lifecycle.abort();
+ },[]);
+ const key=visible.map(v=>v?'1':'0').join('') as keyof typeof data.coalition_scores;
+ const score=data.coalition_scores[key];
+ const s=stages[stage];
+ function explore(){document.getElementById('explorer')?.scrollIntoView({behavior:'smooth'});}
+ return <>
+ <SectionNavigation/>
+ <header className="nav"><a className="brand" href="#"><Scan size={27}/><span>RegionTrace<span className="brand-dot">.</span></span></a><nav aria-label="Main navigation"><a href="#studies">Studies</a><a href="#method">How it works</a><a href="#toolbox">Toolbox</a></nav><a className="paper-link" href="/assets/regiontrace-paper.pdf" target="_blank" rel="noreferrer">Read the paper <ArrowUpRight size={16}/></a></header>
+ <main>
+ <section id="overview" className="hero wrap">
+  <div className="hero-copy"><div className="eyebrow"><span className="live-dot"/> A TOOLBOX FOR MULTIMODAL INTERPRETABILITY</div><h1>Every answer.<br/>A visual <span className="serif">trace.</span></h1><p className="hero-description">Trace how image regions support multimodal generation. Locate the evidence behind an error, and follow its influence as an explanation unfolds.</p><div className="hero-actions"><a className="button primary" href="#explorer">Try the example <ArrowRight size={18}/></a><a className="text-link" href="#method">Meet RegionTrace <ArrowUpRight size={17}/></a></div><div className="hero-foot"><span>Fixed answer</span><i/> <span>Vary regions</span><i/><span>Trace generation</span></div></div>
+  <div className="hero-art"><div className="art-top"><span><span className="tiny-square"/> EVIDENCE / 001</span><span>PACO · InternVL3-8B</span></div><div className="mug-photo" role="img" aria-label={`Mug case, highlighted region: ${regions[region].name}`} style={{backgroundImage:'url(/assets/mug-regions.png)',backgroundPosition:regions[region].pos}}/><div className="photo-caption"><span>“Is the rim black?”</span><span className="answer">Yes <span>Incorrect</span></span></div><div className="floating-evidence"><div className="mini-label">Effect on the incorrect Yes</div><div className="evidence-value"><span style={{color:regions[region].color}}>●</span> {regions[region].name}<strong>{regions[region].value>0?'+':''}{regions[region].value.toFixed(2)}<MoveUpRight size={20}/></strong></div><div className="mini-track"><span style={{width:`${Math.max(Math.abs(regions[region].value)/6*100,3)}%`,background:regions[region].color}}/></div><p>Shapley-averaged Region Effect</p></div><div className="photo-selector">{regions.map((r,i)=><button key={r.name} onClick={()=>setRegion(i)} aria-pressed={region===i} className={region===i?'selected':''}><span style={{background:r.color}}/>{r.name}</button>)}</div></div>
+ </section>
+ <div className="research-strip"><div className="wrap strip-inner"><span className="strip-title">One framework. Three questions.</span><a href="#studies" onClick={()=>setTab('binding')}>01 <span>Where is the evidence?</span><ArrowUpRight size={16}/></a><a href="#studies" onClick={()=>setTab('trajectory')}>02 <span>How does support change?</span><ArrowUpRight size={16}/></a><a href="#studies" onClick={()=>setTab('relook')}>03 <span>Does looking back help?</span><ArrowUpRight size={16}/></a></div></div>
+ <section id="explorer" className="wrap section"><div className="section-heading"><div><div className="eyebrow">A QUICK INTRODUCTION · REGION COMBINATIONS</div><h2>Same question. Different visual evidence.</h2></div><p>Toggle the objects to change the visual context.<br/>Each score comes from a saved model run.</p></div>
+ <div className="explorer intro-explorer"><div className="case-grid"><div className="case-visual"><div className="panel-label">COCO 2017 / IMAGE 81061 <span>FIG. 1</span></div><img className="spatial-image" src={`/assets/${key}.png`} alt={`Region combination ${key}: ${score.visible_regions.join(', ')||'all selected regions hidden'}`}/><div className="region-switches">{['Suitcase','Couch','Chair'].map((r,i)=><label key={r}>{r}<Switch aria-label={`Show ${r}`} checked={visible[i]} onCheckedChange={v=>setVisible(prev=>prev.map((p,j)=>j===i?v:p))}/></label>)}</div></div><div className="case-analysis"><span className="tag">COMPARE VISUAL CONTEXTS</span><h3>A region’s effect depends<br/>on what else is visible.</h3><p className="muted">Is the suitcase in front of the couch?<br/>Fixed target: Yes · InternVL3-8B</p><div className="score-display" aria-live="polite"><span>Support for Yes in this combination</span><strong>{(score.conditional_probability_yes*100).toFixed(1)}<small>%</small></strong><p>Yes–No log-score margin <b>{score.yes_minus_no_margin>0?'+':''}{score.yes_minus_no_margin.toFixed(3)}</b> · Constrained answer <b>{score.binary_argmax==='yes'?'Yes':'No'}</b></p></div><div className="insight"><Scan size={20}/><p>Start with the suitcase and couch. Hide one, then restore it and watch the score change. The method below explains how to measure this difference and account for interactions.</p></div><button className="download-link" onClick={()=>setVisible([true,true,true])}><RotateCcw size={15}/> Restore all regions</button><a className="download-link" href="/assets/spatial-case.json" download><Download size={15}/> Download all eight combinations</a><p className="fineprint">Hidden regions use the processor-mean baseline. Pixels outside the selected regions remain unchanged.</p></div></div></div>
+ <a className="text-link intro-next" href="#method">How do we turn these comparisons into an explanation? <ArrowRight size={17}/></a>
+ </section>
+ <MethodWalkthrough/>
+ <section id="studies" className="wrap section"><div className="section-heading"><div><div className="eyebrow">THREE STUDIES · THREE USES OF REGIONTRACE</div><h2>From the method to the research.</h2></div><p>Explore a case from each study in the paper.<br/>Every interaction replays precomputed data.</p></div>
+ <Tabs value={tab} onValueChange={v=>setTab(String(v))} className="explorer"><TabsList className="case-tabs"><TabsTrigger value="binding">Study I · Attribute binding</TabsTrigger><TabsTrigger value="trajectory">Study II · Generation trace</TabsTrigger><TabsTrigger value="relook">Study III · Relook</TabsTrigger></TabsList>
+ <TabsContent value="binding"><div className="case-grid"><div className="case-visual"><div className="panel-label">PACO / ATTRIBUTE BINDING <span>FIG. 2</span></div><div className="case-mug" role="img" aria-label={`Case image, highlighted region: ${regions[region].name}`} style={{backgroundImage:'url(/assets/mug-regions.png)',backgroundPosition:regions[region].pos}}/><p className="image-note">White rim · Black body · Fixed target: Yes</p></div><div className="case-analysis"><span className="tag">LOCATE ERROR SUPPORT</span><h3>The right color.<br/>The wrong location.</h3><p className="muted">Is black the main color of the rim of the mug?<br/>Ground truth: No. Model answer: Yes.</p><div className="region-bars">{regions.map((r,i)=><button key={r.name} className={`region-row ${region===i?'active':''}`} onClick={()=>setRegion(i)} aria-pressed={region===i}><span className="region-name">{r.name}<small>{r.en}</small></span><span className="bar-zone"><i className="zero-line"/><span className="effect-bar" style={{background:r.color,left:r.value<0?`${15-Math.abs(r.value)*12}%`:'15%',width:`${Math.abs(r.value)*12}%`}}/></span><strong style={{color:r.color}}>{r.value>0?'+':''}{r.value.toFixed(2)}</strong></button>)}</div><div className="chart-caption">Negative: suppresses Yes · Positive: supports Yes.<br/>Shapley-averaged contributions on the Yes–No log-score margin.</div><div className="insight" aria-live="polite"><Scan size={20}/><p>{regions[region].desc}</p></div><a className="download-link" href="/assets/mug-source.csv" download><Download size={15}/> Download case data <ArrowUpRight size={15}/></a></div></div></TabsContent>
+ <TabsContent value="trajectory"><div className="trajectory"><div className="trace-header"><div><span className="tag">MM-GCoT · judgement:673</span><h3>How much do regions add as the explanation grows?</h3></div><span className="muted">InternVL3-8B · Figure 3</span></div><div className="step-controls" aria-label="Generation checkpoints">{stages.map((st,i)=><button key={st.name} aria-pressed={stage===i} className={stage===i?'active':''} onClick={()=>setStage(i)}><span>0{i+1}</span>{st.name}<ChevronRight size={17}/></button>)}</div><div className="trace-body"><div className="trace-text"><div className="eyebrow">{s.label}</div><blockquote>{s.text}</blockquote><p>{s.note}</p></div><div className="trace-chart" aria-live="polite"><div><span>Additional support from selected regions</span><strong>{s.effect.toFixed(1)}<small>pp</small></strong></div><div className="wide-track"><i style={{width:`${s.effect}%`}}/></div><div><span>Answer support under the whole-image baseline</span><strong>{stage===2?'≈':''}{s.baseline.toFixed(1)}<small>%</small></strong></div><div className="wide-track purple"><i style={{width:`${s.baseline}%`}}/></div><p>These are different readouts, not components that sum to 100%. The fixed candidate is the eventual answer, Yes.</p></div></div></div></TabsContent>
+ <TabsContent value="relook"><RelookCase/></TabsContent>
+ </Tabs></section>
+
+ <section id="findings" className="wrap section findings"><div><div className="eyebrow">WHAT THE STUDIES REVEAL</div><h2>From visual evidence<br/>to testable findings.</h2><p>Three studies connect spatial attribution,<br/>generation trajectories, and visual revisits.</p><a className="text-link" href="/assets/regiontrace-paper.pdf#page=5" target="_blank" rel="noreferrer">Read the results <ArrowUpRight size={17}/></a></div><div className="finding-list"><article><span>01</span><div><h3>A wrong answer can have real visual support.</h3><p>Across the evaluated color-misbinding errors, the color-bearing distractor outweighs the queried region in 68.0–97.9% of cases.</p></div></article><article><span>02</span><div><h3>The answer direction often precedes the explanation.</h3><p>Across 7,206 explanations, a complete-image probe matches the eventual answer in 86–92% of traces before explanation begins.</p></div></article><article><span>03</span><div><h3>Looking again does not guarantee renewed visual support.</h3><p>Under equal-length controls, neither Semantic-Back nor Solution-Back yields a reliable pooled accuracy gain. Visual re-engagement needs to be measured, not inferred from revisit text.</p></div></article></div></section>
+ <section id="toolbox" className="wrap toolbox"><div><div className="eyebrow">EXPLORE. INSPECT. REPRODUCE.</div><h2>Start with a case. Follow the evidence.</h2><p>Explore real images, fixed targets, and region combinations to understand how each result is obtained.</p></div><div className="toolbox-links"><a href="/assets/regiontrace-paper.pdf" target="_blank" rel="noreferrer"><BookOpen/><span>Read the full paper<small>Methods, experiments, and measurement boundaries</small></span><ArrowUpRight/></a><a href="/assets/spatial-case.json" download><Download/><span>Get the example data<small>Eight region combinations and measured scores · JSON</small></span><ArrowUpRight/></a><button onClick={()=>explore()}><Scan/><span>Open the case explorer<small>Begin with a spatial relationship</small></span><ArrowRight/></button></div></section>
+ </main><footer className="wrap"><a className="brand" href="#"><Scan size={22}/>RegionTrace.</a><span>Measuring how image regions shape multimodal generation.</span><a href="/assets/regiontrace-paper.pdf" target="_blank" rel="noreferrer">Paper <ArrowUpRight size={14}/></a></footer>
+ </>;
+}
