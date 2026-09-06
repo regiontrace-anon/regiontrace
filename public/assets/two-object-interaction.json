@@ -1,0 +1,66 @@
+{
+  "source": "COCO 81061, InternVL3-8B; four saved subsets of the Figure 1 experiment",
+  "selected_regions": [
+    "suitcase",
+    "couch"
+  ],
+  "fixed_background": "Chair and all pixels outside suitcase/couch stay visible",
+  "question": "Is the suitcase in front of the couch?",
+  "target": "Yes",
+  "score_scale": "Yes\u2013No log-score margin",
+  "measured_subsets": {
+    "001": {
+      "binary_argmax": "no",
+      "conditional_probability_yes": 0.1192029188930649,
+      "logp_no": -0.16906306147575378,
+      "logp_yes": -2.169063091278076,
+      "visible_regions": [
+        "chair"
+      ],
+      "yes_minus_no_margin": -2.0000000298023224
+    },
+    "101": {
+      "binary_argmax": "no",
+      "conditional_probability_yes": 0.40733340004593027,
+      "logp_no": -0.5586156845092773,
+      "logp_yes": -0.9336156845092773,
+      "visible_regions": [
+        "chair",
+        "suitcase"
+      ],
+      "yes_minus_no_margin": -0.375
+    },
+    "011": {
+      "binary_argmax": "yes",
+      "conditional_probability_yes": 0.6513548646660542,
+      "logp_no": -1.1066679954528809,
+      "logp_yes": -0.48166799545288086,
+      "visible_regions": [
+        "chair",
+        "couch"
+      ],
+      "yes_minus_no_margin": 0.625
+    },
+    "111": {
+      "binary_argmax": "yes",
+      "conditional_probability_yes": 0.9993736657443915,
+      "logp_no": -7.378439903259277,
+      "logp_yes": -0.003440059022977948,
+      "visible_regions": [
+        "chair",
+        "couch",
+        "suitcase"
+      ],
+      "yes_minus_no_margin": 7.374999844236299
+    }
+  },
+  "derived": {
+    "suitcase_effect_without_couch": 1.6250000298023224,
+    "suitcase_effect_with_couch": 6.749999844236299,
+    "additive_reference": 2.2500000298023224,
+    "observed_joint_score": 7.374999844236299,
+    "interaction": 5.124999814433977,
+    "two_region_suitcase_shapley": 4.187499937019311
+  },
+  "note": "The additive reference is derived, not a separately measured no-interaction experiment. These are conditional two-region Shapley values, not the original three-region values."
+}
