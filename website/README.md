@@ -51,7 +51,6 @@ The website is a static React application built with Vite, suitable for GitHub P
 - **Mug attribution:** Figure 2 development example, separate from the frozen PACO cohort. Shapley-averaged contributions use the Yes–No log-score margin.
 - **Generation trajectory:** Figure 3, InternVL3-8B, MM-GCoT judgement:673. The three displayed checkpoints use published rounded values. Region effects in percentage points and whole-image-baseline support are distinct readouts.
 - **Relook:** Semantic-Back-7B, MM-GCoT judgement:1027, from `app3_native_lookback_region_curve_remaining354_v1`. The download includes exact saved prefixes and original log scores. The display derives candidate-normalized Yes probabilities and their difference in percentage points, as in Study III. This individual before/after comparison does not isolate the revisit from the added text.
-- **Paper:** the supplied manuscript snapshot is available at `public/assets/regiontrace-paper.pdf`.
 
 Hidden selected regions use the recorded processor-mean baseline; pixels outside those regions remain unchanged.
 
