@@ -1,64 +1,50 @@
 # RegionTrace
 
-An interactive research website for **Measuring how image regions shape multimodal generation**.
+**RegionTrace: Measuring How Image Regions Shape Multimodal Generation**
 
-The website introduces RegionTrace, explains region effects, interactions, and Shapley weighting, and presents examples organized around the paper's three studies. All examples replay saved experimental results; the website does not run model inference.
+**Submitted to ICLR 2027 · Anonymous submission · Under review**
 
-## Run locally
+This repository accompanies our anonymous submission to ICLR 2027. It is maintained through the dedicated anonymous GitHub account [`regiontrace-anon`](https://github.com/regiontrace-anon). Author names, affiliations, and identifying contact details are withheld during double-blind review.
 
-Requires Node.js 22.13 or newer.
+## Project website
+
+[Explore the interactive website](https://regiontrace-anon.github.io/regiontrace/) · [Read the anonymous manuscript](website/public/assets/regiontrace-paper.pdf)
+
+RegionTrace measures how image regions support a fixed answer and how that support changes as multimodal generation unfolds. The website introduces the measurement framework and presents precomputed examples from three studies:
+
+1. **Attribute binding:** locating visual support behind an incorrect attribute assignment.
+2. **Generation traces:** tracking regional support as an explanation grows.
+3. **Look-Back:** measuring visual support before and after an explicit visual revisit.
+
+## Repository structure
+
+```text
+regiontrace/
+├── README.md               # Anonymous submission overview
+├── code/                   # Reserved for the research implementation
+├── website/                # Website source, example assets, and manuscript
+│   └── README.md           # Website setup and data provenance
+└── .github/workflows/      # GitHub Pages deployment
+```
+
+## Research code
+
+**Code release is forthcoming.** The research implementation is being organized and will be uploaded to `code/` once ready. That directory currently contains a placeholder only.
+
+The interactive website replays saved experimental results. Its source is available under `website/`; it is not the research implementation and does not perform live model inference.
+
+## Run the website locally
+
+With Node.js 22.13 or newer:
 
 ```sh
+cd website
 npm ci
 npm run dev
 ```
 
-Open the local URL printed by the development server.
+See [`website/README.md`](website/README.md) for build instructions and example provenance. Updates to the website are published automatically to GitHub Pages.
 
-```sh
-npm run build
-npm start
-```
+## Review status
 
-The website is a static React application built with Vite, suitable for GitHub Pages. Mathematical formulas are rendered with KaTeX.
-
-## Website structure
-
-- **Introduction:** toggle the suitcase, couch, and chair in a measured region-combination example.
-- **Method:** fix an answer, restore a region, then understand interactions and Shapley weighting.
-- **Study I — Attribute binding:** inspect support for the incorrect answer in the mug example.
-- **Study II — Generation trace:** follow regional support as an explanation grows.
-- **Study III — Relook:** inspect the saved visual revisit and compare support before and after it.
-- **Findings and toolbox:** explore the main findings, paper, and downloadable example data.
-
-## Source layout
-
-| Path | Purpose |
-| --- | --- |
-| `app/page.tsx` | Main page, introductory explorer, and study panels |
-| `app/method-walkthrough.tsx` | Interactive method explanation |
-| `app/relook-case.tsx` | Study III checkpoint explorer |
-| `app/section-navigation.tsx` | Section navigation rail |
-| `app/globals.css` | Website styles |
-| `public/assets/` | Experiment images, downloadable measurements, and paper |
-| `components/ui/` | Reusable UI components |
-
-## Evidence and score scales
-
-- **Spatial combinations:** Figure 1 supporting experiment, COCO 2017 image 81061. Eight saved combinations use the boolean order suitcase, couch, chair.
-- **Mug attribution:** Figure 2 development example, separate from the frozen PACO cohort. Shapley-averaged contributions use the Yes–No log-score margin.
-- **Generation trajectory:** Figure 3, InternVL3-8B, MM-GCoT judgement:673. The three displayed checkpoints use published rounded values. Region effects in percentage points and whole-image-baseline support are distinct readouts.
-- **Relook:** Semantic-Back-7B, MM-GCoT judgement:1027, from `app3_native_lookback_region_curve_remaining354_v1`. The download includes exact saved prefixes and original log scores. The display derives candidate-normalized Yes probabilities and their difference in percentage points, as in Study III. This individual before/after comparison does not isolate the revisit from the added text.
-- **Paper:** the supplied manuscript snapshot is available at `public/assets/regiontrace-paper.pdf`.
-
-Hidden selected regions use the recorded processor-mean baseline; pixels outside those regions remain unchanged.
-
-## Deployment
-
-The site is published at https://regiontrace-anon.github.io/regiontrace/. The GitHub Actions workflow in `.github/workflows/deploy.yml` builds and deploys it on every push to `main`. In repository Settings → Pages, the source must be GitHub Actions. The Vite base path is `/regiontrace/`; update it if you deploy under a different repository name.
-
-## Validation
-
-TypeScript checks and the production build pass. Displayed Relook probabilities and differences were checked against the original experiment scores, along with the saved revisit text. Browser interaction testing has not been performed.
-
-The optional WebMCP `explore_region_combination` tool uses the same React state and validates its three boolean inputs. It requires a browser that provides the corresponding API.
+This work is submitted to ICLR 2027 and is under review. Submission does not imply acceptance. The repository, website, and manuscript are provided anonymously for the review process.
