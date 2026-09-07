@@ -4,6 +4,7 @@ import {useState} from 'react';
 import {Download,Eye,ArrowRight} from 'lucide-react';
 import katex from 'katex';
 import data from './relook-data.json';
+import {Cite} from './references';
 
 const checkpoints=[
  {key:'pre_back',label:'Before relook',description:'The model has described the boards and their relationship. The explicit visual revisit has not yet been added.'},
@@ -23,7 +24,7 @@ export default function RelookCase(){
  const pre=data.readouts.pre_back.effect_pp;
  const post=data.readouts.post_back.effect_pp;
  return <article className="trajectory relook-case">
-  <div className="trace-header"><div><span className="tag">STUDY III · LOOK-BACK</span><h3>Does looking again strengthen visual support?</h3></div><span className="muted">Semantic-Back-7B · MM-GCoT · judgement:1027</span></div>
+  <div className="trace-header"><div><span className="tag">STUDY III · LOOK-BACK</span><h3>Does looking again strengthen visual support?</h3></div><span className="muted">Semantic-Back-7B<Cite id="lookback"/> · MM-GCoT<Cite id="mmgcot"/> · judgement:1027</span></div>
   <p className="relook-intro">Look-Back models generate an explicit visual revisit. RegionTrace measures how much the selected regions support the same answer before and after that revisit. The original image remains available throughout generation.</p>
   <div className="relook-question"><span className="eyebrow">THE SKATEBOARD CASE</span><p>{data.question}</p><span>Fixed target: <b>Yes</b> · Ground truth: Yes · Final answer: Yes</span></div>
   <div className="step-controls" aria-label="Relook checkpoints">{checkpoints.map((s,i)=><button key={s.key} className={selected===i?'active':''} aria-pressed={selected===i} onClick={()=>setSelected(i)}><span>0{i+1}</span>{s.label}<ArrowRight size={16}/></button>)}</div>

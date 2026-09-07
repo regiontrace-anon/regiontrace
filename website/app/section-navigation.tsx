@@ -15,7 +15,8 @@ const chapters=[
  {id:'shapley-summary',title:'Summarize with Shapley weights',group:'Method · 03 / Shapley',description:'Read each context, its effect, its Shapley weight, and the resulting weighted contribution.'},
  {id:'studies',title:'Three studies. Three uses of RegionTrace.',group:'Research cases',description:'Explore attribute binding, generation traces, and a real Look-Back example from the paper’s three studies.',major:true},
  {id:'findings',title:'From visual evidence to testable findings',group:'Research findings',description:'Three studies connect spatial attribution, generation trajectories, and visual revisits.',major:true},
- {id:'toolbox',title:'Start with a case. Follow the evidence.',group:'Toolbox',description:'Read the full paper, download example data, or return to the interactive case explorer.',major:true},
+ {id:'toolbox',title:'Start with a case. Follow the evidence.',group:'Toolbox',description:'Explore research code, download example data, or return to the interactive case explorer.',major:true},
+ {id:'references',title:'Datasets, models, and foundations',group:'References',description:'Find the original sources for the resources and methods introduced on this website.',major:true},
 ];
 export default function SectionNavigation(){
  const [active,setActive]=useState('overview');

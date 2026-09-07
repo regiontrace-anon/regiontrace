@@ -1,4 +1,5 @@
 'use client';
+import {Cite} from './references';
 import { useState } from 'react';
 import katex from 'katex';
 import mug from './mug-measurements.json';
@@ -18,7 +19,7 @@ export default function MethodWalkthrough(){
  const selected=couchVisible?1:0;
  const current=contexts[selected];
  return <section id="method" className="method-section"><div className="wrap lesson">
- <div className="section-heading"><div><div className="eyebrow">HOW REGIONTRACE WORKS</div><h2>Follow the evidence, one comparison at a time.</h2></div><a className="text-link" href="assets/regiontrace-paper.pdf#page=3" target="_blank" rel="noreferrer">Read the method <ArrowUpRight size={17}/></a></div>
+ <div className="section-heading"><div><div className="eyebrow">HOW REGIONTRACE WORKS</div><h2>Follow the evidence, one comparison at a time.</h2></div></div>
  <p className="lesson-lead">Start with the mug to understand a single Region Effect. Then use a two-object example to see interaction and Shapley weighting in action.</p>
  <article id="method-target" className="lesson-step">
  <div className="lesson-step-title"><span>01</span><div><h3>One answer. Different visual evidence.</h3><p>Start with the mug above. We track support for the model’s answer, even when it is wrong.</p></div></div>
@@ -55,7 +56,7 @@ export default function MethodWalkthrough(){
  <MathBlock tex={String.raw`\underbrace{-2.000}_{\text{baseline}}+\underbrace{1.625}_{\text{suitcase alone}}+\underbrace{2.625}_{\text{couch alone}}=\underbrace{2.250}_{\text{additive reference}}\quad\neq\quad\underbrace{7.375}_{\text{measured together}}`}/>
  <p className="lesson-note">“No interaction” is a mathematical reference, not another image condition or a claim that a different model was tested. The observed excess of +5.125 is specific to these regions, this fixed background, and this score.</p>
  <h4 id="shapley-summary">Summarize both contexts with Shapley weights.</h4>
- <div className="shapley-intro"><div><span>WHY SHAPLEY?</span><h4>Which effect should represent the suitcase?</h4><p>Only reporting +1.625 misses the strong support available with the couch. Only reporting +6.750 describes the couch-visible condition. The two measurements answer different conditional questions.</p></div><div><span>WHAT IS SHAPLEY?</span><h4>A weighted average over region subsets.</h4><p>Measure the suitcase’s effect for every subset of the other selected regions, then apply Shapley weights. With only two selected objects, there are two contexts—couch hidden or visible—and each receives weight ½.</p></div></div>
+ <div className="shapley-intro"><div><span>WHY SHAPLEY?</span><h4>Which effect should represent the suitcase?</h4><p>Only reporting +1.625 misses the strong support available with the couch. Only reporting +6.750 describes the couch-visible condition. The two measurements answer different conditional questions.</p></div><div><span>WHAT IS SHAPLEY?</span><h4>A weighted average over region subsets.<Cite id="shapley"/></h4><p>Measure the suitcase’s effect for every subset of the other selected regions, then apply Shapley weights. With only two selected objects, there are two contexts—couch hidden or visible—and each receives weight ½.</p></div></div>
  <div className="shapley-comparison">
  <div className="single-effect-panel"><div className="comparison-kicker">ONE SELECTED CONTEXT</div><h4>Region Effect</h4><p className="shapley-question">How much does restoring the suitcase add <em>here</em>?</p><div className="context-choices"><label htmlFor="shapley-couch">Couch visible <Switch id="shapley-couch" checked={couchVisible} onCheckedChange={setCouchVisible}/></label></div><div className="single-score-pair" aria-live="polite"><div><span>Suitcase hidden</span><strong>{signs(score(current.before))}</strong></div><ArrowRight size={19}/><div><span>Suitcase restored</span><strong>{signs(score(current.after))}</strong></div></div><div className="single-effect-result" aria-live="polite"><span>Suitcase’s effect · {current.label.toLowerCase()}</span><strong>{signs(effects[selected])}</strong><div className="effect-meter"><i style={{width:`${effects[selected]/8*100}%`}}/></div></div><p className="shapley-panel-note">The value changes with the selected context. The matching row is highlighted on the right.</p></div>
  <div className="shapley-summary-panel"><div className="comparison-kicker">ALL CONTEXTS · SHAPLEY WEIGHTS</div><h4>Shapley-averaged Region Effect</h4><p className="shapley-question">What is the suitcase’s <em>weighted contribution</em>?</p>
