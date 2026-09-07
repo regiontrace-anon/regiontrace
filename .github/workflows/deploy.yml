@@ -12,6 +12,9 @@ concurrency:
   cancel-in-progress: true
 jobs:
   deploy:
+    defaults:
+      run:
+        working-directory: website
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -22,12 +25,13 @@ jobs:
         with:
           node-version: '24'
           cache: npm
+          cache-dependency-path: website/package-lock.json
       - run: npm ci
       - run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: website/dist
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
