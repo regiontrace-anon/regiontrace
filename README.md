@@ -33,18 +33,6 @@ regiontrace/
 
 The interactive website replays saved experimental results. Its source is available under `website/`; it is not the research implementation and does not perform live model inference.
 
-## Run the website locally
-
-With Node.js 22.13 or newer:
-
-```sh
-cd website
-npm ci
-npm run dev
-```
-
-See [`website/README.md`](website/README.md) for build instructions and example provenance. Updates to the website are published automatically to GitHub Pages.
-
 ## Review status
 
 This work is submitted to ICLR 2027 and is under review. Submission does not imply acceptance. The repository, website, and manuscript are provided anonymously for the review process.
