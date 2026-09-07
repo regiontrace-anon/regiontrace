@@ -8,7 +8,7 @@ This repository accompanies our anonymous submission to ICLR 2027. It is maintai
 
 ## Project website
 
-[Explore the interactive website](https://regiontrace-anon.github.io/regiontrace/) · [Read the anonymous manuscript](website/public/assets/regiontrace-paper.pdf)
+[Explore the interactive website](https://regiontrace-anon.github.io/regiontrace/)
 
 RegionTrace measures how image regions support a fixed answer and how that support changes as multimodal generation unfolds. The website introduces the measurement framework and presents precomputed examples from three studies:
 
